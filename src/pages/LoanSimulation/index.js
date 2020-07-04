@@ -5,23 +5,21 @@ import api from "../../services/api";
 
 import "./styles.css";
 
-export default function Logon() {
-  const userLoan = localStorage.getItem("userLoan");
+export default function LoanSimulation() {
+  const cpf = localStorage.getItem("cpf");
+  const uf = localStorage.getItem("uf");
+  const birth = localStorage.getItem("birth");
+  const requestedAmount = localStorage.getItem("requestedAmount");
+  const taxPerMonth = localStorage.getItem("taxPerMonth");
+  const totalPayable = localStorage.getItem("totalPayable");
+  const plots = localStorage.getItem("plots");
 
   const history = useHistory();
 
-  async function handleLogin(e) {
+  async function handleSimulation(e) {
     e.preventDefault();
-    const cpf = localStorage.getItem("cpf");
-    const uf = localStorage.getItem("uf");
-    const birth = localStorage.getItem("birth");
-    const requestedAmount = localStorage.getItem("requestedAmount");
-    const taxPerMonth = localStorage.getItem("taxPerMonth");
-    const totalPayable = localStorage.getItem("totalPayable");
-    const plots = localStorage.getItem("plots");
 
     try {
-      history.push("/loan-simulation");
     } catch (err) {
       alert("Falha ao simular, tente novamente");
     }
@@ -34,11 +32,11 @@ export default function Logon() {
       </div>
 
       <section className="form">
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSimulation}>
           <div className="form-header">
             <div className="item">
               <h2>VALOR REQUERIDO</h2>
-              <p>R$100.000,00</p>
+              <p>R${requestedAmount}</p>
             </div>
             <div className="item">
               <h2>TAXA DE JUROS</h2>

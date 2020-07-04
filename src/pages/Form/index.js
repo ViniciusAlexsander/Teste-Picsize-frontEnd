@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import {useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { connect } from "react-redux";
+import { updateDataLoan } from "../Store";
+import { date, formatPrice } from "../../lib/utils";
 
 import api from "../../services/api";
 
@@ -7,33 +10,23 @@ import "./styles.css";
 
 import calculatorImg from "../../assets/calculatorImg.svg";
 
-export default function Logon() {
+function Form() {
   const [cpf, setCpf] = useState("");
   const [uf, setUf] = useState("");
   const [birth, setBirth] = useState("");
   const [requestedAmount, setRequestedAmount] = useState("");
   const [deadlinesMonths, setDeadlinesMonths] = useState("");
+
   const history = useHistory();
 
-  async function handleLogin(e) {
+  async function handleForm(e) {
     e.preventDefault();
+    const userLoan = { cpf, uf, birth, requestedAmount, deadlinesMonths };
 
     try {
-      const response = await api.post("/", {
-        cpf,
-        uf,
-        birth,
-        requestedAmount,
-        deadlinesMonths,
-      });
+      const response = await api.post("form", userLoan);
 
-      localStorage.setItem("cpf", response.cpf);
-      localStorage.setItem("uf", response.uf);
-      localStorage.setItem("birth", response.birth);
-      localStorage.setItem("requestedAmount", response.requestedAmount)
-      localStorage.setItem("taxPerMonth", response.taxPerMonth);
-      localStorage.setItem("totalPayable", response.totalPayable);
-      localStorage.setItem("plots", response.plots);
+      updateDataLoan(response.data)
 
       history.push("/loan-simulation");
     } catch (err) {
@@ -49,7 +42,7 @@ export default function Logon() {
       </div>
 
       <section className="form">
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleForm}>
           <h2>PREENCHA O FORMULÁRIO PARA SIMULAÇÃO</h2>
 
           <input
@@ -67,7 +60,7 @@ export default function Logon() {
           <input
             className="date"
             placeholder="DATA DE NASCIMENTO: DD/MM/AAAA"
-            // type="date"
+            type="date"
             value={birth}
             onChange={(e) => setBirth(e.target.value)}
           />
@@ -92,3 +85,9 @@ export default function Logon() {
     </div>
   );
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return { updateDataLoan: (dataLoan) => dispatch(updateDataLoan(dataLoan)) };
+};
+
+export default connect(mapDispatchToProps)(Form);
