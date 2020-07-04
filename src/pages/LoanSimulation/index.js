@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
+import { formatPrice } from "../../lib/utils";
 
 import api from "../../services/api";
 
@@ -9,18 +10,36 @@ export default function LoanSimulation() {
   const cpf = localStorage.getItem("cpf");
   const uf = localStorage.getItem("uf");
   const birth = localStorage.getItem("birth");
-  const requestedAmount = localStorage.getItem("requestedAmount");
+  const deadlinesMonths = localStorage.getItem("deadlinesMonths");
+  let requestedAmount = localStorage.getItem("requestedAmount");
   const taxPerMonth = localStorage.getItem("taxPerMonth");
-  const totalPayable = localStorage.getItem("totalPayable");
-  const plots = localStorage.getItem("plots");
+  let totalPayable = localStorage.getItem("totalPayable");
 
-  const history = useHistory();
+  const json = localStorage.getItem("plots");
+  const plots = JSON.parse(json);
+
+  const data = {
+    cpf,
+    uf,
+    birth,
+    deadlinesMonths,
+    requestedAmount,
+    taxPerMonth,
+    totalPayable,
+    plots,
+  };
+
+  requestedAmount = formatPrice(requestedAmount);
+  totalPayable = formatPrice(totalPayable);
 
   async function handleSimulation(e) {
     e.preventDefault();
 
     try {
+      await api.post("loan-simulation", data);
+      alert(`Simulação concluida com sucesso`);
     } catch (err) {
+      console.log(err)
       alert("Falha ao simular, tente novamente");
     }
   }
@@ -36,36 +55,32 @@ export default function LoanSimulation() {
           <div className="form-header">
             <div className="item">
               <h2>VALOR REQUERIDO</h2>
-              <p>R${requestedAmount}</p>
+              <p>{requestedAmount}</p>
             </div>
             <div className="item">
               <h2>TAXA DE JUROS</h2>
-              <p>1%</p>
+              <p>{taxPerMonth}%</p>
             </div>
           </div>
 
           <div className="item">
             <h2>PAGAR EM</h2>
-            <p>3 Meses</p>
+            <p>{deadlinesMonths} Meses</p>
           </div>
 
           <div className="item">
             <h2>PROJEÇÃO DAS PARCELAS</h2>
-            <div className="plots">
-              <p>20/07/2020</p>
-              <p>R$ 34.004,46</p>
-            </div>
-            <div className="plots">
-              <p>20/08/2020</p>
-              <p>R$ 34.004,46</p>
-            </div>
-            <div className="plots">
-              <p>20/09/2020</p>
-              <p>R$ 34.004,46</p>
-            </div>
+
+            {plots.map((plot) => (
+              <div className="plots">
+                <p>{plot.installmentMaturity}</p>
+                <p>{plot.installmentValue}</p>
+              </div>
+            ))}
+
             <div className="total">
               <p>TOTAL</p>
-              <p>R$ 102.013,37</p>
+              <p>{totalPayable}</p>
             </div>
           </div>
 

@@ -17,6 +17,7 @@ function Form() {
   const [requestedAmount, setRequestedAmount] = useState("");
   const [deadlinesMonths, setDeadlinesMonths] = useState("");
 
+
   const history = useHistory();
 
   async function handleForm(e) {
@@ -25,8 +26,20 @@ function Form() {
 
     try {
       const response = await api.post("form", userLoan);
+      
 
-      updateDataLoan(response.data)
+      localStorage.setItem("cpf", response.data.cpf);
+      localStorage.setItem("uf", response.data.uf);
+      localStorage.setItem("birth", response.data.birth);
+      localStorage.setItem("deadlinesMonths", response.data.deadlinesMonths);
+      localStorage.setItem("requestedAmount", response.data.requestedAmount);
+      localStorage.setItem("taxPerMonth", response.data.taxPerMonth);
+      localStorage.setItem("totalPayable", response.data.totalPayable);
+      
+      const plots = JSON.stringify(response.data.plots)
+      localStorage.setItem("plots", plots);
+
+      updateDataLoan(response.data);
 
       history.push("/loan-simulation");
     } catch (err) {
@@ -50,12 +63,14 @@ function Form() {
             value={cpf}
             type="text"
             onChange={(e) => setCpf(e.target.value)}
+            required
           />
           <input
             placeholder="UF"
             value={uf}
             type="text"
             onChange={(e) => setUf(e.target.value)}
+            required
           />
           <input
             className="date"
@@ -63,18 +78,21 @@ function Form() {
             type="date"
             value={birth}
             onChange={(e) => setBirth(e.target.value)}
+            required
           />
           <input
             placeholder="VALOR REQUERIDO"
             value={requestedAmount}
             type="number"
             onChange={(e) => setRequestedAmount(e.target.value)}
+            required
           />
           <input
             placeholder="MESES PARA PAGAR"
             value={deadlinesMonths}
             type="number"
             onChange={(e) => setDeadlinesMonths(e.target.value)}
+            required
           />
 
           <button className="button" type="submit">
