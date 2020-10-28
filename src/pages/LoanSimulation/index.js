@@ -36,7 +36,7 @@ export default function LoanSimulation() {
     e.preventDefault();
 
     try {
-      await api.post("loan-simulation", data);
+      await api.post("loans", data);
       alert(`Simulação concluida com sucesso`);
     } catch (err) {
       console.log(err)
